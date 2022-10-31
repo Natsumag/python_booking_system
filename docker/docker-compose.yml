@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+  web:
+    container_name: ${MODULE_NAME}-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      LOG_LEVEL: DEBUG
+    command: >
+      bash -c "
+      uvicomrn app.main.app --host 0.0.0.0 --port 80 --reload
+      "
+    volumes:
+      - ..:/code
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+    networks:
+      - network
+  db:
+    container_name: ${MODULE_NAME}-db
+    image: mysql:8.0
+    ports:
+      - ${DB_EX_PORT}:3306
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE
+    cap_add:
+      - SYS_NICE
+    volumes:
+      - data:/var/lib/msyql
+    networks:
+      - network
+  phpmyadmin:
+    image: phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_ARBITRARY=1
+    networks:
+      - network
+volumes:
+  data:
+    driver: local
+networks:
+  network:
+    name: pragma_${MODULE_NAME}

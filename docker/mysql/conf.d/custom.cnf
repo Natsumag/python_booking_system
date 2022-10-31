@@ -1,0 +1,4 @@
+[mysql]
+default-character-st=utf8mb4
+[mysqld]
+character-set-server=utf8mb4
